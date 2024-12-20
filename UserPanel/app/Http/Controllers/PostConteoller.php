@@ -14,6 +14,16 @@ class PostConteoller extends Controller
     public function store(Request $request)
     {
         
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string',
+            'body' => 'required|string',
+            'user_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->messages(), 422);
+        }
+
         $post = Post::create([
             'title' => $request->title,
             'body' => $request->body,
