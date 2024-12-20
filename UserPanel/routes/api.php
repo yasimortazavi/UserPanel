@@ -31,3 +31,4 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/posts/{post}', [PostController::class, 'delete']);
 });
 
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
