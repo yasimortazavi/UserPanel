@@ -36,4 +36,31 @@ class AuthController extends ApiController
             'token' => $token
         ], 201);
     }
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->messages(), 422);
+        }
+
+        $user = User::where('email' , $request->email)->first();
+
+        if(!$user){
+            return $this->errorResponse('user not found', 401);
+        }
+        if(!Hash::check($request->password , $user->password)){
+            return $this->errorResponse('password is incorrect', 401);
+        }
+
+        $token = $user->createToken('myApp')->accessToken;
+
+        return $this->successResponse([
+            'user' => $user,
+            'token' => $token
+        ], 200);
+    }
 }
