@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Post;
 use Carbon\Carbon;
+use App\Http\Resources\PostResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -10,7 +11,15 @@ class PostController extends ApiController
 {
     public function index()
     {
-        return $this->successResponse(Post::all(), 200);
+        // return $this->successResponse(Post::all(), 200);
+        $posts = Post::paginate(2);
+        return $this->successResponse([
+            'posts' => PostResource::collection($posts),
+            'links' => PostResource::collection($posts)->response()->getData()->links,
+            'meta' => PostResource::collection($posts)->response()->getData()->meta,
+        ], 200);
+
+        return PostResource::collection($posts);
     }
 
     public function show(Post $post)
