@@ -45,4 +45,29 @@ class PostController extends ApiController
 
         return $this->successResponse($post, 201);
     }
+    public function update(Request $request, Post $post)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string',
+            'body' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->errorResponse($validator->messages(), 422);
+        }
+
+        if ($request->has('image')) {
+            $imageName = Carbon::now()->microsecond . '.' . $request->image->extension();
+            $request->image->storeAs('images/posts', $imageName, 'public');
+        }
+
+        $post->update([
+            'title' => $request->title,
+            'body' => $request->body,
+            'image' => $request->has('image') ? $imageName : $post->image,
+            'user_id' => $request->user_id,
+        ]);
+
+        return $this->successResponse($post, 200);
+    }
 }
