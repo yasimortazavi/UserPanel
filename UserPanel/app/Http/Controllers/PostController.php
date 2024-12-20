@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Post;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
-class PostConteoller extends Controller
+class PostController extends ApiController
 {
     public function index()
     {
@@ -15,13 +17,14 @@ class PostConteoller extends Controller
     {
         return $this->successResponse($post, 200);
     }
-    
+
     public function store(Request $request)
     {
         
         $validator = Validator::make($request->all(), [
             'title' => 'required|string',
             'body' => 'required|string',
+            'image' => 'required|image',
             'user_id' => 'required',
         ]);
 
@@ -29,11 +32,15 @@ class PostConteoller extends Controller
             return $this->errorResponse($validator->messages(), 422);
         }
 
+        $imageName = Carbon::now()->microsecond . '.' . $request->image->extension();
+
+        $request->image->storeAs('images/posts' , $imageName, 'public');
+
         $post = Post::create([
             'title' => $request->title,
             'body' => $request->body,
-            'image' => $request->image,
-            'user_id' => $request->user_id,
+            'image' => $imageName,
+            // 'user_id' => $request->user_id,
         ]);
 
         return $this->successResponse($post, 201);
