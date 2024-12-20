@@ -11,6 +11,11 @@ class PostConteoller extends Controller
         return $this->successResponse(Post::all(), 200);
     }
 
+    public function show(Post $post)
+    {
+        return $this->successResponse($post, 200);
+    }
+    
     public function store(Request $request)
     {
         
